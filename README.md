@@ -4,16 +4,16 @@
 
 
 
-### Contenidos
+## Contenidos
 
-[Tarea 1](#31-Tarea-1)  
-[Tarea 2](#32-Tarea-2)
+[Tarea 1](#31-tarea-1)  
+[Tarea 2](#32-tarea-2)
 
-### 3.1. Tarea 1
+## 3.1. Tarea 1
 
-## Detección de monedas en una imagen fija
+### Detección de monedas en una imagen fija
 
-Lo primero que hacemos es definir los diámetro de las monedas en mm
+Lo primero que hacemos es definir los diámetros de las monedas en mm
 
 ``` python
 DIAMETROS_EURO_MM = {
@@ -32,7 +32,7 @@ convertimos la imagen a escala de grises, con medianBlur() reducimos el ruido an
 
 
 ``` python
-img_monedas = cv2.imread('Monedas.jpg')     # si se pone Monedas_mias.jpg, se prueba con otra imagen, pero los datos que proporciona no son correctos.)
+img_monedas = cv2.imread('Monedas.jpg')     # si se pone Monedas_mias.jpg, se prueba con otra imagen, pero los datos que proporciona no son correctos.
 img_rgb = cv2.cvtColor(img_monedas, cv2.COLOR_BGR2RGB)
 img_gris = cv2.cvtColor(img_monedas, cv2.COLOR_BGR2GRAY)
 
@@ -43,7 +43,7 @@ circulos = cv2.HoughCircles(img_gris, cv2.HOUGH_GRADIENT, dp=1, minDist=100, par
 
 HoughCircles, controla la sensibilidad del detector, separación mínima y rango de radios
 
-el siguiente fragmento de código recorre los círculos detectados, para cada uno calcula la distancia entre el centro del circulo  y el punto donde se hizo clic. Si la distancia es menos que el radio r, el clic está dentro de ese círculos, para esta parte (calcular el radio) se utilizo la ayuda de la inteligencia artificial
+el siguiente fragmento de código recorre los círculos detectados, para cada uno calcula la distancia entre el centro del círculo  y el punto donde se hizo clic. Si la distancia es menos que el radio r, el clic está dentro de ese círculo, para localizar un círculo donde se hizo clic, se utilizó la ayuda de la inteligencia artificial
 
 ``` python
 for c in circulos[0, :]:
@@ -62,7 +62,7 @@ una vez encontrado el radio, calculamos la escala de píxeles por mm.
 ``` python
 escala = (2 * radio_ref) / DIAMETROS_EURO_MM[1.00]
 ```
-2 * radio, para obtener el diámetro , y al dividirlo por el de la moneda de 1 euros obtenemos los mm.
+2 * radio, para obtener el diámetro , y al dividirlo por el de la moneda de 1 euros obtenemos los píxeles por mm
 
 en la siguiente parte, haremos la suma, y compararemos las monedas
 
@@ -88,19 +88,22 @@ for c in circulos[0, :]:
     
     total += valor
 ``` 
-obtenemos el valor del diámetro de la moneda, y comprobamos con todo el diccionario, y nos quedamos con el que se quede mas cercar en valor absoluto, y al final sumamos el valor, y dibujamos los círculos de nuevo, alrededor de las monedas
+obtenemos el valor del diámetro de la moneda, y comprobamos con todo el diccionario, y nos quedamos con el que se quede más cercano en valor absoluto, y al final sumamos el valor, y dibujamos los círculos de nuevo, alrededor de las monedas
 
+RESULTADO:Funciona con la imagen ideal, es cierto que, en la otra imagen que se puede usar Monedas_mias.jpg, no funciona del todo correcto y es que habría que usar HoughCircles y cambiar los parámetros, para poder hacer un mejor análisis con la otra imagen
 
-## Detección de monedas con cámara en tiempo real
+<img src="Monedas_contadas.png" width="500">
 
-lo primero que hacemos es abrir la cámara ( esto es importante ya que no usare del portátil, para mayor comodidad ), y la escala, esto influye mucho, ya que dependiendo si va estar muy cerca o muy lejos, hará que no se detecten las monedas, o hará que se detecten muchas mas
+### Detección de monedas con cámara en tiempo real
+
+lo primero que hacemos es abrir la cámara ( esto es importante ya que no se usará del portátil, para mayor comodidad ), y la escala, esto influye mucho, ya que dependiendo si va estar muy cerca o muy lejos, hará que no se detecten las monedas, o hará que se detecten muchas más
 
 ``` python
 vid = cv2.VideoCapture(1)
 escala = 3.5
 ``` 
 
-se realiza lo mismo que antes, solo que en vez de ser una imagen, es en un video, se convierten las imagenes a escala de grises y se reduce el ruido con un flitro, y volvemos a utilizar a Hough para los circulos.
+se realiza lo mismo que antes, solo que en vez de ser una imagen, es en un video, se convierten las imágenes a escala de grises y se reduce el ruido con un filtro, y volvemos a utilizar a Hough para los círculos.
 
 ``` python
 while(True):      
@@ -117,7 +120,7 @@ while(True):
 
 ``` 
 
-en esta ultima sección de codigo se hace algo muy parecido a lo de antes, se calcula el diametro de la moneda y lo dividimos por la escala, comprobamos el diametro, con el resto de las monedas, le asignamos si concide y tiene unos valores muy parecido, en ese momento le ponemos el valor y dibujamos un circulo con el valor, si no esta dentro de los margenes, dibujamos un circulos, poniendo que es un objeto desconocido
+en esta última sección de código se hace algo muy parecido a lo de antes, se calcula el diámetro de la moneda y lo dividimos por la escala, comprobamos el diámetro, con el resto de las monedas, le asignamos si coincide y tiene unos valores muy parecido, en ese momento le ponemos el valor y dibujamos un círculo con el valor, si no esta dentro de los margenes, dibujamos un círculos, poniendo que es un objeto desconocido
 
 ```python
 if circulos is not None:
@@ -145,9 +148,12 @@ if circulos is not None:
 
 luego simplemente, mostramos por pantalla, el valor total de las monedas que se muestran, y pintamos, los objetos circulares que tengan medidas aceptables, sean monedas o no
 
-### 3.2. Tarea 2
+RESULTADO: no funciona del todo bien y es que lo que pasa es que al estar en una escala fija 3,5 px/mm, va a depender mucho de la distancia de la cámara, y es que hay varias monedas con tamaños similares, tampoco se probaron solapes
 
-la función contornos, convierte la imagen a escala de grises, suaviza el ruido y palica un umbral de Otsu, y findContours extrae los contornos externos
+
+## 3.2. Tarea 2
+
+la función contornos, convierte la imagen a escala de grises, suaviza el ruido y aplica un umbral de Otsu, y findContours extrae los contornos externos
 
 ``` python
 def contornos(img):
@@ -156,7 +162,7 @@ def contornos(img):
     return cv2.findContours(th, cv2.RETR_EXTERNAL, cv2.CHAIN_APPROX_SIMPLE)[0]
 ``` 
 
-para extraer las caracteristicas, se utilizo la IA, ya que, esta fue una de las partes mas complicadas, y es que al principio intente, utilizar varios elementos, como son las medidas y los colores, pero decidi al final, con la ayuda de la IA, dejarlo solo en las medidas, ya que me da mejores resultos
+para extraer las características, se utilizó la IA, ya que, esta fue una de las partes más complicadas, y es que al principio se intentó usar varias características, como medidas y colores y aunque al final el resultado es bajo (0,383 de accuracy), creo que uno de los errores se debe a que las imágenes de entrenamiento y de test tienen escalas diferentes
 
 ``` python
 def caracteristicas(img, c):
@@ -174,7 +180,7 @@ def caracteristicas(img, c):
 ]
 ``` 
 
-para la siguiente parte tambien se utilizo IA, y es que en esta parte lo que se realiza es el procesamiento de las imagenes originales; StandarScaler, normaliza las caracteristicas para que tengan escalas comparables, SVC(kernel="rbf") crea un clasificador SVM,y class_weight="balanced" compensa parcialmenet las diferencias en el numero de ejemplos 
+para la siguiente parte también se utilizó IA, y es que en esta parte lo que se realiza es el procesamiento de las imágenes originales; StandardScaler, normaliza las características para que tengan escalas comparables, SVC(kernel="rbf") crea un clasificador SVM,y class_weight="balanced" compensa parcialmente las diferencias en el número de ejemplos 
 
 ``` python
 for archivo, clase in archivos:
@@ -190,7 +196,7 @@ modelo = make_pipeline(
 )
 ```
 
-ahora se intentara extraer las características de la imagen
+ahora se intentará extraer las características de la imagen
 
 ``` python
 img = cv2.imread("MPs_test.jpg")
@@ -200,7 +206,7 @@ colores = {"FRA": (0,0,255), "PEL": (0,255,0), "TAR": (255,0,0)}
 
 ``` 
 
-accedemos a cada columna por su nombre, y extraemos de la imagen la region indicada por el csv
+accedemos a cada columna por su nombre, y extraemos de la imagen la región indicada por el csv
 
 ``` python
 with open("MPs_test_bbs.csv", newline="") as f:
@@ -214,8 +220,10 @@ with open("MPs_test_bbs.csv", newline="") as f:
 ``` 
 
 
+
+aplicamos la función contornos, y se descartan los contornos con un área muy pequeña, si hay varios elige la mayor área 
 ``` python
-aplicamos la función contornos, y se descartan los contorno con un area muy pequeña, si hay varios elige la mayor area 
+
 
   candidatos = [c for c in contornos(recorte)
                       if cv2.contourArea(c) > 5]
@@ -229,7 +237,7 @@ aplicamos la función contornos, y se descartan los contorno con un area muy peq
                           
 ``` 
 
-ahora por ultimo, intentamos predecir con modelo.predict y real = fila["label"] es para comprobar, y dibujamos en la imagen, los elementos encontrados, según el tipo de tipo encontrado
+ahora por ultimo, intentamos predecir con modelo.predict y real = fila["label"] es para comprobar, y dibujamos en la imagen, los elementos encontrados, según el tipo encontrado
 
 ``` python
  pred = modelo.predict([caracteristicas(recorte, c)])[0]
@@ -245,4 +253,13 @@ clases = ["FRA", "PEL", "TAR"]
 print("Exactitud:", round(accuracy_score(verdaderas, predichas), 3))
 print("Predicciones:", {c: predichas.count(c) for c in clases})
 ``` 
-y por ultimo, seria mostrar la matrix de confusion, y como de preciso es el modelo
+y por ultimo, sería mostrar la matriz de confusión, y como de preciso es el modelo
+
+RESULTADO:
+aquí se observa que la exactitud no es muy buena, como se señaló antes y es que, aunque selecciona mal la mayoría, las partículas se localizan con las cajas del CSV, pero en lo que se falla es en la clasificación
+<img src = "confusion.png" width="500">
+
+
+
+
+LIMITACIONES: los malos resultados de esta última tarea, se pueden deber a varios motivos y uno de ellos es que, las imágenes usadas tienen escala diferente y al hacer log1p(área), depende directamente de la escala, y se perjudica el resultado y otro motivo, es que no se utilizan ni color ni textura, otro motivo del fallo es que en el entrenamiento , el filtro de área > 20 es demasiado pequeño
